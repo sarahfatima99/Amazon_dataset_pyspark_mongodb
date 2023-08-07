@@ -45,26 +45,17 @@ class Database:
 
             collection = self.__db__["Amazon_reviews"]
             inserted_document = collection.insert_one(document)
-            self.insert_into_audit_logs(id= document['asin'],status='Successfully Inserted',isTransformed=0,error_desc='')
+            self.insert_into_audit_logs(id= document['asin'],
+                                        status='Successfully Inserted',
+                                        isTransformed=0,
+                                        error_desc='')
         
         else:
-            self.insert_into_audit_logs(id= document['asin'],status='error',isTransformed=0,error_desc=errors)      
+            self.insert_into_audit_logs(id= document['asin'],
+                                        status='error',
+                                        isTransformed=0,
+                                        error_desc=errors)      
             
-           
-
-    def insert_into_audit_logs(self,id,status,isTransformed,error_desc):
-
-        collection = self.__db__["Audit_logs"]
-        audit_log_doc = {
-        'object_id':id,
-        'status':status,
-        'error_desc':error_desc,
-        'isTransformed':isTransformed,
-        'inserted_time':datetime.utcnow()
-
-            }
-        
-        collection.insert_one(audit_log_doc)
 
 
 
@@ -83,11 +74,30 @@ class Database:
                 document.append(single_doc)
                 collection = self.__db__["Amazon_reviews"]
                 inserted_document = collection.insert_many(document)
+                self.insert_into_audit_logs(id= single_doc['asin'],status='Successfully Inserted',isTransformed=0,error_desc='')
 
             else:
-                pass       
+                self.insert_into_audit_logs(id= document['asin'],
+                                        status='error',
+                                        isTransformed=0,
+                                        error_desc=errors)             
         
-        
+                   
+
+    def insert_into_audit_logs(self,id,status,isTransformed,error_desc):
+
+        collection = self.__db__["Audit_logs"]
+        audit_log_doc = {
+        'object_id':id,
+        'status':status,
+        'error_desc':error_desc,
+        'isTransformed':isTransformed,
+        'inserted_time':datetime.utcnow()
+
+            }
+
+        collection.insert_one(audit_log_doc)
+
         
 
 

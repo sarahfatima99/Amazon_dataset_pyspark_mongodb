@@ -18,7 +18,7 @@ class pyspark:
     __folder_path__ = __root_path__ +'\Amazon_dataset_pyspark_mongodb\datasets'
     spark =  None
     __db_obj__ = None
-    
+    __vd_obj__ = None
 
     def __init__(self):
 
@@ -31,46 +31,15 @@ class pyspark:
         self.__db_obj__ = Database()
 
 
+
     def load_data(self):
 
         file_path = self.__folder_path__ + '\\' +'AMAZON_FASHION_5.json'
         df = self.spark.read.json(file_path)
         df=df.withColumn('overall', col('overall').cast(IntegerType()))
-        self.__db_obj__.insert_one_into_collection(df,3)
+        self.__db_obj__.insert_one_into_collection(df,row_num=1)
 
-        # self.__db_obj__.insert_bulk_into_collection(df,start,stop)
-
-
-        # self.partition_data(df)
-
-        # single_row = df.limit(1).collect()[0].asDict()
-        # print(single_row)
-        # print(df.limit(5).collect()[0].asDict())
-        # self.__db_obj__.insert_one(single_row)
-   
-        # insert_single_row(single_row)
-        # self.summariz_data(df)
-
-    
-    def partition_data(self,df):
-        df = df.withColumn('partition_num', F.spark_partition_id())
-        df.persist()
-        total_partition = [int(row.partition_num) for row 
-                           in df.select('partition_num').distinct().collect()]
-        print(total_partition)
-        
-
-        # total_partition = [int(row.partition_num) for row in 
-        # 
-
-        # for each_df in total_partition:
-        #     sample_dict[each_df] = df.where(df.partition_num == each_df) 
-        # pass
-
-
-    def transform_data(self,df):
-
-        pass   
+       
 
     def summariz_data(self,df):
 
@@ -85,12 +54,11 @@ class pyspark:
            ,count('overall').alias('counts'))
             
 
-        # product_reviewer_summary.write.parquet('product_reviewer_summary.parquet')
-        # product_summary.write.parquet('product_summary.parquet')
-        
+    
 
+    def transform_data(self,df):
 
-        
+        pass   
 
 
 

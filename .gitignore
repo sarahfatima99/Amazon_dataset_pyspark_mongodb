@@ -1,4 +1,4 @@
 /datasets
 /config.ini
-/env
-/monitor_anomali.py
+/.env
+/__pycache__

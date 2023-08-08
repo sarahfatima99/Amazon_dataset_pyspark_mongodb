@@ -54,10 +54,8 @@ class Database:
             self.insert_into_audit_logs(id= document['asin'],
                                         status='error',
                                         isTransformed=0,
-                                        error_desc=errors)      
+                                        error_desc=errors)     
             
-
-
 
     def insert_bulk_into_collection(self,df,start,stop):
         
@@ -80,9 +78,8 @@ class Database:
                 self.insert_into_audit_logs(id= document['asin'],
                                         status='error',
                                         isTransformed=0,
-                                        error_desc=errors)             
-        
-                   
+                                        error_desc=errors)     
+                                     
 
     def insert_into_audit_logs(self,id,status,isTransformed,error_desc):
 
@@ -96,9 +93,7 @@ class Database:
 
             }
 
-        collection.insert_one(audit_log_doc)
-
-        
+        collection.insert_one(audit_log_doc)        
 
 
     def update_data(self,filter_column,filter_value,update_column,update_value):

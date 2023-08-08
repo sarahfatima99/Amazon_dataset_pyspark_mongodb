@@ -9,6 +9,7 @@ from pyspark.sql.functions import col, round, mean, count , max, min, lower
 from pyspark.sql.types import IntegerType
 from database import Database
 from pyspark.sql import functions as F
+from monitor_anomali import anomali
 import os
 
 
@@ -19,6 +20,7 @@ class pyspark:
     spark =  None
     __db_obj__ = None
     __vd_obj__ = None
+    __anomali_obj = None
 
     def __init__(self):
 
@@ -28,6 +30,8 @@ class pyspark:
         .config("spark.driver.memory", "2g") \
         .config("spark.sql.shuffle.partitions", "200").getOrCreate() \
         
+        self.__anomali_obj = anomali()
+
         self.__db_obj__ = Database()
 
 
@@ -37,7 +41,9 @@ class pyspark:
         file_path = self.__folder_path__ + '\\' +'AMAZON_FASHION_5.json'
         df = self.spark.read.json(file_path)
         df=df.withColumn('overall', col('overall').cast(IntegerType()))
-        self.__db_obj__.insert_one_into_collection(df,row_num=1)
+        # self.__db_obj__.insert_one_into_collection(df,row_num=1)
+        self.summariz_data(df)
+        self.__anomali_obj.meansure_metric(df)
 
        
 
@@ -52,9 +58,8 @@ class pyspark:
             max('overall').alias('max_rating')
            ,min('overall').alias('min_rating')
            ,count('overall').alias('counts'))
+       
             
-
-    
 
     def transform_data(self,df):
 

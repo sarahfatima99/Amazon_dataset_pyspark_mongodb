@@ -1,5 +1,5 @@
-import pymongo
 import os
+import pymongo
 from dotenv import load_dotenv
 from validate_data import validate_data
 from datetime import datetime
@@ -61,25 +61,28 @@ class Database:
         
         document = []
 
-        for i in range(start,stop+1):
+        for i in range(start,stop):           
+            
 
             single_doc = df.collect()[i].asDict()  
             result = self.validate_row(single_doc)
+          
             status = result['status']
             errors = result['errors']  
 
             if status == True:
-                document.append(single_doc)
-                collection = self.__db__["Amazon_reviews"]
-                inserted_document = collection.insert_many(document)
-                self.insert_into_audit_logs(id= single_doc['asin'],status='Successfully Inserted',isTransformed=0,error_desc='')
-
+                document.append(single_doc)               
+                                
             else:
-                self.insert_into_audit_logs(id= document['asin'],
+                self.insert_into_audit_logs(id= single_doc['asin'],
                                         status='error',
                                         isTransformed=0,
-                                        error_desc=errors)     
-                                     
+                                        error_desc=errors)  
+        
+        if len(document) != 0:      
+            collection = self.__db__["Amazon_reviews"]    
+            collection.insert_many(document)               
+     
 
     def insert_into_audit_logs(self,id,status,isTransformed,error_desc):
 
@@ -112,13 +115,12 @@ class Database:
         results_cursor = collection.find(query)
         results_list = list(results_cursor)
 
-        for document in results_list:
-              print(document)
+        
 
     def validate_row(self,document):
         
-        vd = validate_data(document)
-        result = vd.validate_all_checks()
+        vd = validate_data()
+        result = vd.validate_all_checks(document)
         return result
        
  

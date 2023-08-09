@@ -5,33 +5,32 @@
 # 4. insert into database
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, round, mean, count , max, min, lower
+from pyspark.sql.functions import col, round, mean, count , max, min
 from pyspark.sql.types import IntegerType
-from database import Database
 from pyspark.sql import functions as F
 from monitor_anomali import anomali
+from database import Database
 import os
 
 
 class pyspark:
 
     __root_path__ = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
-    __folder_path__ = __root_path__ +'\Amazon_dataset_pyspark_mongodb\datasets'
+    __folder_path__ = os.path.join(__root_path__,'Amazon_dataset_pyspark_mongodb','datasets')
     spark =  None
     __db_obj__ = None
     __vd_obj__ = None
-    __anomali_obj = None
+    
 
     def __init__(self):
 
         self.spark = SparkSession.builder.appName("DETask") \
-        .config("spark.executor.memory", "4g") \
-        .config("spark.executor.cores", "4") \
-        .config("spark.driver.memory", "2g") \
+        .config("spark.executor.memory", "1g") \
+        .config("spark.executor.cores", "1") \
+        .config("spark.driver.memory", "1g") \
         .config("spark.sql.shuffle.partitions", "200").getOrCreate() \
         
-        self.__anomali_obj = anomali()
-
+        self.spark.conf.set("spark.sql.parquet.compression.codec", "snappy")
         self.__db_obj__ = Database()
 
 
@@ -41,11 +40,9 @@ class pyspark:
         file_path = self.__folder_path__ + '\\' +'AMAZON_FASHION_5.json'
         df = self.spark.read.json(file_path)
         df=df.withColumn('overall', col('overall').cast(IntegerType()))
-        # self.__db_obj__.insert_one_into_collection(df,row_num=1)
-        self.summariz_data(df)
-        self.__anomali_obj.meansure_metric(df)
+        num_of_rows = 100
+        self.__db_obj__.insert_bulk_into_collection(df,0,num_of_rows)
 
-       
 
     def summariz_data(self,df):
 
@@ -58,12 +55,10 @@ class pyspark:
             max('overall').alias('max_rating')
            ,min('overall').alias('min_rating')
            ,count('overall').alias('counts'))
+        
+        product_reviewer_summary.write.mode("overwrite").parquet('product_review.parquet')
        
-            
 
-    def transform_data(self,df):
-
-        pass   
 
 
 

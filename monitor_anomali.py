@@ -68,8 +68,6 @@ class anomali:
             round(stddev("overall"),2).alias('standard_dev')
             )
         product_review.show()
-
-        df_length = df.count()
         
 
         for i in range(0,25):

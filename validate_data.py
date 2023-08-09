@@ -15,15 +15,18 @@ class validate_data:
     errors = []
     status = False
     
-    def __init__(self,data):
-        self.data = data
+    def __init__(self):
+      pass
 
-    def validate_all_checks(self):
+    def validate_all_checks(self,data):
 
-        overall = self.data['overall']
-        reviewText = self.data['reviewText']
-        review_id = self.data['reviewerID']
+        self.status = False
+        self.errors = []
 
+        overall = data['overall']
+        reviewText = data['reviewText']
+        review_id = data['reviewerID']
+       
         self.validate_overall(overall)
         self.validate_review_id(review_id)
         self.validate_reviewer_text(reviewText)
@@ -50,7 +53,7 @@ class validate_data:
     def validate_review_id(self,review_id):
 
         if review_id is None or review_id == '': 
-            self.errors.append('review text is empty')
+            self.errors.append('review id is empty')
 
 
     

@@ -3,7 +3,7 @@
 ## Table of Contents
 - [Description](#description)
 - [Installation](#installation)
-- [Database setup and environment varialbles](#Seting up database and environment variables)
+- [Project%20Setup](#Project%20Setup)
 
 
 ## Description:
@@ -18,7 +18,7 @@ Follow the instruction for project setup:
 3. pip install -r requirements.txt
 4. download mongodb using the url https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-6.0.8-signed.msi
 
-## Seting up database and environment variables:
+## Project Setup:
 
 1. Add .env file in your project
 2. Add following variables and their respective values (example)

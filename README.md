@@ -3,7 +3,7 @@
 ## Table of Contents
 - [Description](#description)
 - [Installation](#installation)
-- [Project%20Setup](#Project%20Setup)
+- [Project Setup](#Project%20Setup)
 
 
 ## Description:

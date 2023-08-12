@@ -29,6 +29,7 @@ class anomali:
     def send_alert(self,avg_anomali_prod,prod_stddev):
 
         if  (len(avg_anomali_prod) != 0):   
+            
             body = 'Average ratings anomali detetcted in following items : \n'
             
             for items in avg_anomali_prod:
@@ -43,8 +44,9 @@ class anomali:
                 for key, value in items.items():
                     body += f"{key}: {value}\n"
 
+
         msg = MIMEMultipart()
-        msg['From'] = self.sender_emails
+        msg['From'] = self.sender_email
         msg['To'] = self.receiver_email
         msg['Subject'] = self.subject
         msg.attach(MIMEText(body, 'plain'))

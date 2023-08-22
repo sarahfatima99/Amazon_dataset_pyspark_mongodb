@@ -2,11 +2,9 @@ import pandas as pd
 import numpy as np
 import smtplib
 from email.mime.text import MIMEText
-from pyspark.sql.functions import col, round, stddev,mean
 import os
 from dotenv import load_dotenv
 from email.mime.multipart import MIMEMultipart
-import time
 
 
 class anomali:
@@ -57,35 +55,26 @@ class anomali:
         server.sendmail(self.sender_email, self.receiver_email, msg.as_string())
         server.quit()
 
-    def meansure_metric(self,df):
+    
+    def meansure_metric(self,product_review):
 
-        mean_threshold = 4
-        std_threshold = 1
+        mean_threshold = 1
+        std_threshold = 4
         avg_anomali_prod = []
         std_dev_prod = []
+        reviews = product_review.collect()
 
-
-        product_review=df.groupBy('asin').agg(
-            round(mean("overall"),2).alias("Average_ratings"),
-            round(stddev("overall"),2).alias('standard_dev')
-            )
-        product_review.show()
-        
-
-        for i in range(0,25):
-         
-            single_prod = product_review.collect()[i].asDict()
-            prod_mean = single_prod['Average_ratings']
-            prod_stddev = single_prod['standard_dev']
+        for review in reviews:        
+          
+            prod_mean = review['Average_ratings']
+            prod_stddev = review['standard_dev']
             
             if abs(prod_mean - mean_threshold) < mean_threshold * 0.1:
-                avg_anomali_prod.append({'Prod_id':single_prod['asin'],'average':single_prod['Average_ratings']})
+                avg_anomali_prod.append({'Prod_id':review['asin'],'average':review['Average_ratings']})
 
             if  prod_stddev is None or abs(prod_stddev - std_threshold) > std_threshold * 0.1 :
-                std_dev_prod.append({'Prod_id':single_prod['asin'],'standard dev':single_prod['standard_dev']})
+                std_dev_prod.append({'Prod_id':review['asin'],'standard dev':review['standard_dev']})
         
         if len(std_dev_prod) != 0 and len(avg_anomali_prod) != 0:
             self.send_alert(avg_anomali_prod,std_dev_prod)
 
-
-       

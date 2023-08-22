@@ -6,6 +6,7 @@ from datetime import datetime
 from pymongo.errors import PyMongoError
 
 
+
 class Database:
 
     __client__ = None
@@ -32,7 +33,6 @@ class Database:
 
         return self.__client__
     
-
     def insert_one_into_collection(self,df,row_num):
         
         try:
@@ -65,23 +65,22 @@ class Database:
                                         error_desc=str(e))   
 
    
-    def insert_bulk_into_collection(self,df,start,stop):
+    def insert_bulk_into_collection(self,df):
         
         try:
             
             document = []
-
-            for i in range(start,stop):           
-                
-
-                single_doc = df.collect()[i].asDict()  
-                result = self.validate_row(single_doc)
+            df_list = df.collect()
+                    
+            for single_doc in df_list:
+                single_dict = single_doc.asDict()
+                result = self.validate_row(single_dict)
             
                 status = result['status']
                 errors = result['errors']  
 
                 if status == True:
-                    document.append(single_doc)               
+                    document.append(single_dict)               
                                     
                 else:
                     self.insert_into_audit_logs(id= single_doc['asin'],
@@ -95,7 +94,7 @@ class Database:
                              
         except PyMongoError as e:
             self.insert_into_audit_logs(id='', status='error', isTransformed=0, error_desc=str(e))
-
+    
 
     def insert_into_audit_logs(self,id,status,isTransformed,error_desc):
         
@@ -103,7 +102,7 @@ class Database:
 
             collection = self.__db__["Audit_logs"]
             audit_log_doc = {
-            'object_id':id,
+            'asin':id,
             'status':status,
             'error_desc':error_desc,
             'isTransformed':isTransformed,
@@ -135,10 +134,11 @@ class Database:
         
         try:
         
-            query = {filter_column: {"$gte": filter_value}}  
             collection = self.__db__["Amazon_reviews"] 
-            results_cursor = collection.find(query)
+            results_cursor = collection.find({},{filter_column:  filter_value})
+            print(results_cursor)
             results_list = list(results_cursor)
+            print(results_list)
             
         except PyMongoError as e:
             print(f"Error retrieving the data: {str(e)}")
@@ -161,6 +161,3 @@ class Database:
 
     
     
-
-    
-
